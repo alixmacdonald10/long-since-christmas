@@ -1,14 +1,7 @@
-use std::{
-    fs::File,
-    io::{self, BufRead},
-};
-
-use miette::{Context, Error, IntoDiagnostic};
-use shared::{DayRunner, Part};
+use miette::Context;
+use shared::{read_file_to_vec, DayRunner, Part, Result};
 
 const INPUT_FILE_PATH: &str = "inputs/day-one/input.txt";
-
-type RunnerReturnType<T> = miette::Result<T, Error>;
 
 #[derive(Clone, Debug)]
 pub struct Runner {
@@ -16,7 +9,7 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn new(input: Option<Vec<String>>) -> RunnerReturnType<Self> {
+    pub fn new(input: Option<Vec<String>>) -> Result<Self> {
         if let Some(input) = input {
             Ok(Runner { input })
         } else {
@@ -26,7 +19,7 @@ impl Runner {
         }
     }
 
-    fn run_part_one(&self) -> RunnerReturnType<u32> {
+    fn run_part_one(&self) -> Result<u32> {
         let values = self
             .input
             .iter()
@@ -59,7 +52,7 @@ impl Runner {
         Ok(output_value)
     }
 
-    fn run_part_two(&self) -> RunnerReturnType<u32> {
+    fn run_part_two(&self) -> Result<u32> {
         let lookup_digits = std::collections::HashMap::from([
             ("one", "1"),
             ("two", "2"),
@@ -124,7 +117,7 @@ impl Runner {
 }
 
 impl DayRunner for Runner {
-    type ReturnType = RunnerReturnType<u32>;
+    type ReturnType = Result<u32>;
 
     fn run(&self, part: &shared::Part) -> Self::ReturnType {
         match part {
@@ -132,23 +125,6 @@ impl DayRunner for Runner {
             Part::PartTwo => self.run_part_two(),
         }
     }
-}
-
-fn read_file_to_vec(file_path: &str) -> RunnerReturnType<Vec<String>> {
-    let file = File::open(file_path)
-        .into_diagnostic()
-        .wrap_err(format!("while opening file {file_path:#?}"))?;
-
-    let file_content = io::BufReader::new(file)
-        .lines()
-        .enumerate()
-        .map(|(idx, line)| {
-            line.into_diagnostic().wrap_err(format!("while reading line {idx:#?}"))
-        })
-        .collect::<RunnerReturnType<Vec<String>>>()
-        .wrap_err("while reading file contents")?;
-
-    Ok(file_content)
 }
 
 #[cfg(test)]
