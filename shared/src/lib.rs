@@ -2,7 +2,7 @@ use std::fmt::{Display, Debug};
 
 use clap::ValueEnum;
 
-// defines common behaviour for each dayly challenge
+// defines common behaviour for each daily challenge
 pub trait DayRunner {
     type ReturnType;
 
